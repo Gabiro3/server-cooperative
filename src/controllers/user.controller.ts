@@ -5,7 +5,7 @@ import { getCurrentUserService } from "../services/user.service";
 
 export const getCurrentUserController = asyncHandler(
   async (req: Request, res: Response) => {
-    const userId = req.headers["userId"] as string;
+    const userId = req.headers["userid"] as string;
 
     const { user } = await getCurrentUserService(userId);
 
