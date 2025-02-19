@@ -26,7 +26,7 @@ export const createWorkspaceController = asyncHandler(
   async (req: Request, res: Response) => {
     const body = createWorkspaceSchema.parse(req.body);
 
-    const userId = req.user?._id;
+    const userId = req.headers["userid"] as string;
     const { workspace } = await createWorkspaceService(userId, body);
 
     return res.status(HTTPSTATUS.CREATED).json({
@@ -40,7 +40,7 @@ export const createWorkspaceController = asyncHandler(
 
 export const getAllWorkspacesUserIsMemberController = asyncHandler(
   async (req: Request, res: Response) => {
-    const userId = req.user?._id;
+    const userId = req.headers["userid"] as string;
 
     const { workspaces } = await getAllWorkspacesUserIsMemberService(userId);
 
@@ -54,7 +54,7 @@ export const getAllWorkspacesUserIsMemberController = asyncHandler(
 export const getWorkspaceByIdController = asyncHandler(
   async (req: Request, res: Response) => {
     const workspaceId = workspaceIdSchema.parse(req.params.id);
-    const userId = req.user?._id;
+    const userId = req.headers["userid"] as string;
 
     await getMemberRoleInWorkspace(userId, workspaceId);
 
@@ -70,7 +70,7 @@ export const getWorkspaceByIdController = asyncHandler(
 export const getWorkspaceMembersController = asyncHandler(
   async (req: Request, res: Response) => {
     const workspaceId = workspaceIdSchema.parse(req.params.id);
-    const userId = req.user?._id;
+    const userId = req.headers["userid"] as string;
 
     const { role } = await getMemberRoleInWorkspace(userId, workspaceId);
     roleGuard(role, [Permissions.VIEW_ONLY]);
@@ -88,7 +88,7 @@ export const getWorkspaceMembersController = asyncHandler(
 export const getWorkspaceAnalyticsController = asyncHandler(
   async (req: Request, res: Response) => {
     const workspaceId = workspaceIdSchema.parse(req.params.id);
-    const userId = req.user?._id;
+    const userId = req.headers["userid"] as string;
 
     const { role } = await getMemberRoleInWorkspace(userId, workspaceId);
     roleGuard(role, [Permissions.VIEW_ONLY]);
@@ -107,7 +107,7 @@ export const changeWorkspaceMemberRoleController = asyncHandler(
     const workspaceId = workspaceIdSchema.parse(req.params.id);
     const { memberId, roleId } = changeRoleSchema.parse(req.body);
 
-    const userId = req.user?._id;
+    const userId = req.headers["userid"] as string;
 
     const { role } = await getMemberRoleInWorkspace(userId, workspaceId);
     roleGuard(role, [Permissions.CHANGE_MEMBER_ROLE]);
@@ -130,7 +130,7 @@ export const updateWorkspaceByIdController = asyncHandler(
     const workspaceId = workspaceIdSchema.parse(req.params.id);
     const { name, description } = updateWorkspaceSchema.parse(req.body);
 
-    const userId = req.user?._id;
+    const userId = req.headers["userid"] as string;
 
     const { role } = await getMemberRoleInWorkspace(userId, workspaceId);
     roleGuard(role, [Permissions.EDIT_WORKSPACE]);
@@ -152,7 +152,7 @@ export const deleteWorkspaceByIdController = asyncHandler(
   async (req: Request, res: Response) => {
     const workspaceId = workspaceIdSchema.parse(req.params.id);
 
-    const userId = req.user?._id;
+    const userId = req.headers["userid"] as string;
 
     const { role } = await getMemberRoleInWorkspace(userId, workspaceId);
     roleGuard(role, [Permissions.DELETE_WORKSPACE]);

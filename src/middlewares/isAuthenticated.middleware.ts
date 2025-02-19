@@ -3,21 +3,17 @@ import UserModel from "../models/user.model";
 
 const isAuthenticated = (req: Request, res: Response, next: NextFunction): void => {
   try {
-    // If Passport has attached the user, allow access
-    if (req.user && req.user._id) {
-      return next();
-    }
+    // Check if userId is provided in the headers
+    const userId = req.headers["userid"] as string;
 
-    // If req.user is missing, check for userId in the request body
-    const { userId } = req.body;
     if (!userId) {
-      res.status(401).json({ success: false, message: "Unauthorized: No user ID provided." });
+      res.status(401).json({ success: false, message: "Unauthorized: No user ID in headers." });
       return;
     }
 
-    // Fetch user from DB synchronously
+    // Fetch user from DB
     UserModel.findById(userId)
-      .select("-password")
+      .select("-password") // Exclude password from the user data
       .then((user) => {
         if (!user) {
           return res.status(401).json({ success: false, message: "User not found." });
@@ -37,3 +33,4 @@ const isAuthenticated = (req: Request, res: Response, next: NextFunction): void 
 };
 
 export default isAuthenticated;
+
