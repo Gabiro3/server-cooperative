@@ -1,11 +1,19 @@
 import { NextFunction, Request, Response } from "express";
-import { UnauthorizedException } from "../utils/appError";
 
-const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
+const isAuthenticated = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
   if (!req.user || !req.user._id) {
-    throw new UnauthorizedException("Unauthorized. Please log in.");
+    res.status(401).json({
+      success: false,
+      message: "Unauthorized. Please log in.",
+    });
+    return; // Stop execution without returning a value
   }
   next();
 };
 
 export default isAuthenticated;
+
