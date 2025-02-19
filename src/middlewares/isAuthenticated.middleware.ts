@@ -4,7 +4,7 @@ import UserModel from "../models/user.model";
 const isAuthenticated = (req: Request, res: Response, next: NextFunction): void => {
   try {
     // Check if userId is provided in the headers
-    const userId = req.headers["userid"] as string;
+    const userId = req.headers["userId"] as string;
 
     if (!userId) {
       res.status(401).json({ success: false, message: "Unauthorized: No user ID in headers." });
