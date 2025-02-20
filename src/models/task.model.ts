@@ -11,6 +11,7 @@ export interface TaskDocument extends Document {
   taskCode: string;
   title: string;
   description: string | null;
+  amount: number | null;
   project: mongoose.Types.ObjectId;
   workspace: mongoose.Types.ObjectId;
   status: TaskStatusEnumType;
@@ -39,6 +40,10 @@ const taskSchema = new Schema<TaskDocument>(
       trim: true,
       default: null,
     },
+    amount: {
+      type: Number,
+      default: 0,
+    },
     project: {
       type: Schema.Types.ObjectId,
       ref: "Project",
@@ -60,9 +65,8 @@ const taskSchema = new Schema<TaskDocument>(
       default: TaskPriorityEnum.MEDIUM,
     },
     assignedTo: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      default: null,
+      type: String,
+      required: true,
     },
     createdBy: {
       type: Schema.Types.ObjectId,
@@ -79,6 +83,6 @@ const taskSchema = new Schema<TaskDocument>(
   }
 );
 
-const TaskModel = mongoose.model<TaskDocument>("Task", taskSchema);
+const TaskModel = mongoose.model<TaskDocument>("Loan", taskSchema);
 
 export default TaskModel;

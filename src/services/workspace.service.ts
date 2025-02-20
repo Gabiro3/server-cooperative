@@ -8,6 +8,7 @@ import { BadRequestException, NotFoundException } from "../utils/appError";
 import TaskModel from "../models/task.model";
 import { TaskStatusEnum } from "../enums/task.enum";
 import ProjectModel from "../models/project.model";
+import FarmerModel from "../models/farmer.model";
 
 //********************************
 // CREATE NEW WORKSPACE
@@ -117,28 +118,93 @@ export const getWorkspaceMembersService = async (workspaceId: string) => {
 export const getWorkspaceAnalyticsService = async (workspaceId: string) => {
   const currentDate = new Date();
 
-  const totalTasks = await TaskModel.countDocuments({
-    workspace: workspaceId,
-  });
+  // Using Mongoose aggregate to fetch task analytics
+  const taskAnalytics = await TaskModel.aggregate([
+    {
+      $match: {
+        workspace: new mongoose.Types.ObjectId(workspaceId),
+      },
+    },
+    {
+      $facet: {
+        // Total tasks
+        totalTasks: [{ $count: "count" }],
+        
+        // Pending loans (tasks with status IN_REVIEW or IN_PROGRESS)
+        pendingLoans: [
+          {
+            $match: {
+              status: { $in: [TaskStatusEnum.IN_REVIEW, TaskStatusEnum.IN_PROGRESS] },
+            },
+          },
+          {
+            $group: {
+              _id: null,
+              totalAmount: { $sum: "$amount" },  // Sum the amounts of pending loans
+              count: { $sum: 1 },  // Count the number of pending loans
+            },
+          },
+        ],
 
-  const overdueTasks = await TaskModel.countDocuments({
-    workspace: workspaceId,
-    dueDate: { $lt: currentDate },
-    status: { $ne: TaskStatusEnum.DONE },
-  });
+        // Approved loans (tasks with status APPROVED)
+        approvedLoans: [
+          {
+            $match: {
+              status: TaskStatusEnum.DONE,  // Assuming DONE means approved
+            },
+          },
+          {
+            $group: {
+              _id: null,
+              totalAmount: { $sum: "$amount" },  // Sum the amounts of approved loans
+              count: { $sum: 1 },  // Count the number of approved loans
+            },
+          },
+        ],
 
-  const completedTasks = await TaskModel.countDocuments({
-    workspace: workspaceId,
-    status: TaskStatusEnum.DONE,
-  });
+        // Overdue tasks (tasks whose due date is past and not DONE)
+        overdueTasks: [
+          {
+            $match: {
+              dueDate: { $lt: currentDate },
+              status: { $ne: TaskStatusEnum.DONE },
+            },
+          },
+          {
+            $count: "count",
+          },
+        ],
+
+        // Completed tasks (tasks with status DONE)
+        completedTasks: [
+          {
+            $match: {
+              status: TaskStatusEnum.DONE,
+            },
+          },
+          { $count: "count" },
+        ],
+      },
+    },
+  ]);
+
+  const _analytics = taskAnalytics[0];
+
+  // Fetch the total number of members in the workspace
+  const totalMembers = await FarmerModel.countDocuments({
+    cooperativeId: workspaceId,
+  });  
 
   const analytics = {
-    totalTasks,
-    overdueTasks,
-    completedTasks,
+    pendingLoans: _analytics.pendingLoans[0]?.totalAmount || 0,
+    approvedLoans: _analytics.approvedLoans[0]?.totalAmount || 0,
+    loansAmount: (_analytics.pendingLoans[0]?.totalAmount || 0) + (_analytics.approvedLoans[0]?.totalAmount || 0),
+    totalMembers: totalMembers || 0,  // Number of members in the workspace
   };
 
-  return { analytics };
+  return {
+    analytics,
+  };
 };
 
 export const changeMemberRoleService = async (

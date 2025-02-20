@@ -96,7 +96,7 @@ export const getWorkspaceAnalyticsController = asyncHandler(
     const { analytics } = await getWorkspaceAnalyticsService(workspaceId);
 
     return res.status(HTTPSTATUS.OK).json({
-      message: "Workspace analytics retrieved successfully",
+      message: "Cooperative analytics retrieved successfully",
       analytics,
     });
   }

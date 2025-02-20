@@ -84,7 +84,7 @@ export const getProjectAnalyticsService = async (
 
   const currentDate = new Date();
 
-  //USING Mongoose aggregate
+  // Using Mongoose aggregate
   const taskAnalytics = await TaskModel.aggregate([
     {
       $match: {
@@ -93,20 +93,55 @@ export const getProjectAnalyticsService = async (
     },
     {
       $facet: {
+        // Total tasks
         totalTasks: [{ $count: "count" }],
+        
+        // Pending loans (tasks with status IN_REVIEW or IN_PROGRESS)
+        pendingLoans: [
+          {
+            $match: {
+              status: { $in: [TaskStatusEnum.IN_REVIEW, TaskStatusEnum.IN_PROGRESS] },
+            },
+          },
+          {
+            $group: {
+              _id: null,
+              totalAmount: { $sum: "$amount" },  // Calculate the total amount for pending loans
+              count: { $sum: 1 },  // Count the number of pending loans
+            },
+          },
+        ],
+
+        // Approved loans (tasks with status APPROVED)
+        approvedLoans: [
+          {
+            $match: {
+              status: TaskStatusEnum.DONE,
+            },
+          },
+          {
+            $group: {
+              _id: null,
+              totalAmount: { $sum: "$amount" },  // Calculate the total amount for approved loans
+              count: { $sum: 1 },  // Count the number of approved loans
+            },
+          },
+        ],
+
+        // Overdue tasks (tasks whose due date is past and not DONE)
         overdueTasks: [
           {
             $match: {
               dueDate: { $lt: currentDate },
-              status: {
-                $ne: TaskStatusEnum.DONE,
-              },
+              status: { $ne: TaskStatusEnum.DONE },
             },
           },
           {
             $count: "count",
           },
         ],
+
+        // Completed tasks (tasks with status DONE)
         completedTasks: [
           {
             $match: {
@@ -125,6 +160,10 @@ export const getProjectAnalyticsService = async (
     totalTasks: _analytics.totalTasks[0]?.count || 0,
     overdueTasks: _analytics.overdueTasks[0]?.count || 0,
     completedTasks: _analytics.completedTasks[0]?.count || 0,
+    // For pending and approved loans, you need to access totalAmount and count from the group stage
+    pendingLoans: _analytics.pendingLoans[0]?.totalAmount || 0,
+    approvedLoans: _analytics.approvedLoans[0]?.totalAmount || 0,
+    loansAmount: (_analytics.pendingLoans[0]?.totalAmount || 0) + (_analytics.approvedLoans[0]?.totalAmount || 0),
   };
 
   return {

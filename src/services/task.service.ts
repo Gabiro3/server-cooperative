@@ -11,13 +11,14 @@ export const createTaskService = async (
   body: {
     title: string;
     description?: string;
+    amount: number;
     priority: string;
     status: string;
     assignedTo?: string | null;
     dueDate?: string;
   }
 ) => {
-  const { title, description, priority, status, assignedTo, dueDate } = body;
+  const { title, description, priority, status, assignedTo, dueDate, amount } = body;
 
   const project = await ProjectModel.findById(projectId);
 
@@ -26,21 +27,12 @@ export const createTaskService = async (
       "Project not found or does not belong to this workspace"
     );
   }
-  if (assignedTo) {
-    const isAssignedUserMember = await MemberModel.exists({
-      userId: assignedTo,
-      workspaceId,
-    });
-
-    if (!isAssignedUserMember) {
-      throw new Error("Assigned user is not a member of this workspace.");
-    }
-  }
   const task = new TaskModel({
     title,
     description,
     priority: priority || TaskPriorityEnum.MEDIUM,
     status: status || TaskStatusEnum.TODO,
+    amount: amount || 0,
     assignedTo,
     createdBy: userId,
     workspace: workspaceId,

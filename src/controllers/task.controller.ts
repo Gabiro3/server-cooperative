@@ -34,11 +34,11 @@ export const createTaskController = asyncHandler(
       workspaceId,
       projectId,
       userId,
-      body
+      { ...body, amount: req.body.amount }
     );
 
     return res.status(HTTPSTATUS.OK).json({
-      message: "Task created successfully",
+      message: "Loan created successfully",
       task,
     });
   }
@@ -65,7 +65,7 @@ export const updateTaskController = asyncHandler(
     );
 
     return res.status(HTTPSTATUS.OK).json({
-      message: "Task updated successfully",
+      message: "Loan updated successfully",
       task: updatedTask,
     });
   }
@@ -103,7 +103,7 @@ export const getAllTasksController = asyncHandler(
     const result = await getAllTasksService(workspaceId, filters, pagination);
 
     return res.status(HTTPSTATUS.OK).json({
-      message: "All tasks fetched successfully",
+      message: "All loans fetched successfully",
       ...result,
     });
   }
@@ -123,7 +123,7 @@ export const getTaskByIdController = asyncHandler(
     const task = await getTaskByIdService(workspaceId, projectId, taskId);
 
     return res.status(HTTPSTATUS.OK).json({
-      message: "Task fetched successfully",
+      message: "Loan fetched successfully",
       task,
     });
   }
@@ -142,7 +142,7 @@ export const deleteTaskController = asyncHandler(
     await deleteTaskService(workspaceId, taskId);
 
     return res.status(HTTPSTATUS.OK).json({
-      message: "Task deleted successfully",
+      message: "Loan deleted successfully",
     });
   }
 );
