@@ -1,0 +1,19 @@
+{
+    "version": 2,
+    "name": "Blinkit",
+    "builds": [
+      {
+        "src": "src/index.ts",   
+        "config": {
+          "maxLambdaSize": "50mb"  
+        }
+      }
+    ],
+    "routes": [
+      {
+        "src": "/(.*)",
+        "dest": "/src/index.ts"
+      }
+    ]
+  }
+  
