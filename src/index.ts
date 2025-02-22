@@ -25,6 +25,7 @@ const app = express();
 const BASE_PATH = config.BASE_PATH;
 
 app.use(express.json());
+
 app.use(express.urlencoded({ extended: true }));
 
 app.use(
@@ -58,7 +59,15 @@ app.use(`${BASE_PATH}/farmer`, isAuthenticated, farmerRoutes);
 
 app.use(errorHandler);
 
-// Vercel's function handler
-module.exports = (req: Request, res: Response) => {
-  app(req, res);
-};
+app.get("/",(request,response)=>{
+  ///server to client
+  response.json({
+      message : "Server is running " + config.PORT
+  })
+})
+connectDatabase().then(()=>{
+  app.listen(config.PORT,()=>{
+      console.log("Server is live",config.PORT)
+  })
+})
+
