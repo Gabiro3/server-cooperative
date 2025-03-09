@@ -66,7 +66,4 @@ connectDatabase().then(()=>{
       console.log("Server is live",config.PORT)
   })
 })
-export default (req: Request, res: Response) => {
-  app(req, res); // Vercel serverless function entry point
-};
 
