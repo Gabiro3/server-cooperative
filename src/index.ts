@@ -5,10 +5,6 @@ import session from "cookie-session";
 import { config } from "./config/app.config";
 import connectDatabase from "./config/database.config";
 import { errorHandler } from "./middlewares/errorHandler.middleware";
-import { HTTPSTATUS } from "./config/http.config";
-import { asyncHandler } from "./middlewares/asyncHandler.middleware";
-import { BadRequestException } from "./utils/appError";
-import { ErrorCodeEnum } from "./enums/error-code.enum";
 
 import "./config/passport.config";
 import passport from "passport";
@@ -70,4 +66,7 @@ connectDatabase().then(()=>{
       console.log("Server is live",config.PORT)
   })
 })
+export default (req: Request, res: Response) => {
+  app(req, res); // Vercel serverless function entry point
+};
 
