@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { TaskPriorityEnum, TaskStatusEnum } from "../enums/task.enum";
 
-export const titleSchema = z.string().trim().min(1).max(255);
-export const amountSchema  =z.number().int().min(0).optional();
+export const titleSchema = z.string().trim().min(1).max(255).optional();
+export const amountSchema  =z.number().int().min(0).optional().optional();
 export const descriptionSchema = z.string().trim().optional();
 
 export const assignedToSchema = z.string().trim().min(1).nullable().optional();

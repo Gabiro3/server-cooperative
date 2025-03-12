@@ -239,6 +239,40 @@ export const changeMemberRoleService = async (
   };
 };
 
+
+// Add Loan Officer to the Cooperative
+export const addOfficerToWorkspaceService = async (
+  workspaceId: string,
+  officerId: string
+) => {
+  // Check if workspace exists
+  const workspace = await WorkspaceModel.findById(workspaceId);
+  if (!workspace) {
+    throw new NotFoundException("Workspace not found");
+  }
+
+
+  // Check if officer is already a member
+  const existingMember = await MemberModel.findOne({ workspaceId, userId: officerId });
+
+  if (!existingMember) {
+    // Get default role for officers
+    const defaultRole = await RoleModel.findOne({ name: "OFFICER" });
+    if (!defaultRole) {
+      throw new NotFoundException("Member not found");
+    }
+
+    // Add officer as a member
+    await MemberModel.create({
+      userId: officerId,
+      workspaceId,
+      role: defaultRole._id, // Assign the officer role
+    });
+  }
+
+  return { officer: officerId };
+};
+
 //********************************
 // UPDATE WORKSPACE
 //**************** **************/

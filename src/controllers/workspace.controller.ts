@@ -18,6 +18,7 @@ import {
   updateWorkspaceByIdService,
 } from "../services/workspace.service";
 import { getMemberRoleInWorkspace } from "../services/member.service";
+import { addOfficerToWorkspaceService } from "../services/workspace.service";
 import { Permissions } from "../enums/role.enum";
 import { roleGuard } from "../utils/roleGuard";
 import { updateWorkspaceSchema } from "../validation/workspace.validation";
@@ -121,6 +122,22 @@ export const changeWorkspaceMemberRoleController = asyncHandler(
     return res.status(HTTPSTATUS.OK).json({
       message: "Member Role changed successfully",
       member,
+    });
+  }
+);
+
+export const addOfficerToWorkspaceController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const workspaceId = workspaceIdSchema.parse(req.params.id); // Validate workspaceId
+    const { officerId } = req.body; // Get officerId from the request body
+
+    // Step 2: Call the service function to add the officer to the workspace
+    const { officer } = await addOfficerToWorkspaceService(workspaceId, officerId);
+
+    // Step 3: Return success response with the officer added
+    return res.status(HTTPSTATUS.OK).json({
+      message: "Officer added to workspace successfully",
+      officer,
     });
   }
 );

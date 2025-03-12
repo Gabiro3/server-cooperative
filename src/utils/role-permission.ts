@@ -21,7 +21,6 @@ export const RolePermissions: Record<RoleType, Array<PermissionType>> = {
     Permissions.DELETE_PROJECT,
 
     Permissions.CREATE_TASK,
-    Permissions.EDIT_TASK,
     Permissions.DELETE_TASK,
 
     Permissions.VIEW_ONLY,
@@ -32,7 +31,6 @@ export const RolePermissions: Record<RoleType, Array<PermissionType>> = {
     Permissions.EDIT_PROJECT,
     Permissions.DELETE_PROJECT,
     Permissions.CREATE_TASK,
-    Permissions.EDIT_TASK,
     Permissions.DELETE_TASK,
     Permissions.MANAGE_WORKSPACE_SETTINGS,
     Permissions.VIEW_ONLY,
@@ -44,6 +42,5 @@ export const RolePermissions: Record<RoleType, Array<PermissionType>> = {
   MEMBER: [
     Permissions.VIEW_ONLY,
     Permissions.CREATE_TASK,
-    Permissions.EDIT_TASK,
   ],
 };

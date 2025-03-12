@@ -34,7 +34,7 @@ export const createTaskController = asyncHandler(
       workspaceId,
       projectId,
       userId,
-      { ...body, amount: req.body.amount }
+      { ...body, title: body.title || "", amount: req.body.amount }
     );
 
     return res.status(HTTPSTATUS.OK).json({

@@ -5,6 +5,7 @@ import session from "cookie-session";
 import { config } from "./config/app.config";
 import connectDatabase from "./config/database.config";
 import { errorHandler } from "./middlewares/errorHandler.middleware";
+import multer from "multer";
 
 import "./config/passport.config";
 import passport from "passport";
@@ -16,6 +17,8 @@ import memberRoutes from "./routes/member.route";
 import projectRoutes from "./routes/project.route";
 import taskRoutes from "./routes/task.route";
 import farmerRoutes from "./routes/farmer.route";
+import { uploadDocument } from "./uploadthing";
+import { deleteDocument, getDocuments } from "./controllers/document.controller";
 
 const app = express();
 const BASE_PATH = config.BASE_PATH;
@@ -52,7 +55,35 @@ app.use(`${BASE_PATH}/member`, isAuthenticated, memberRoutes);
 app.use(`${BASE_PATH}/project`, isAuthenticated, projectRoutes);
 app.use(`${BASE_PATH}/task`, isAuthenticated, taskRoutes);
 app.use(`${BASE_PATH}/farmer`, isAuthenticated, farmerRoutes);
+const upload = multer({ storage: multer.memoryStorage() });
+app.use(`${BASE_PATH}/upload`, upload.single("file"), async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    await uploadDocument(req, res, next);
+  } catch (error) {
+    next(error);
+  }
+});
+app.post(
+  `${BASE_PATH}/documents`,
+  async (req, res, next) => {
+    try {
+      await getDocuments(req, res, next);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 
+app.delete(
+  `${BASE_PATH}/delete-file`,
+  async (req, res, next) => {
+    try {
+      await deleteDocument(req, res, next);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 app.use(errorHandler);
 
 app.get("/",(request,response)=>{

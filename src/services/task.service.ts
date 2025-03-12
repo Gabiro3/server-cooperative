@@ -50,9 +50,9 @@ export const updateTaskService = async (
   projectId: string,
   taskId: string,
   body: {
-    title: string;
+    title?: string;
     description?: string;
-    priority: string;
+    priority?: string;
     status: string;
     assignedTo?: string | null;
     dueDate?: string;
